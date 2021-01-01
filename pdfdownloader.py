@@ -37,7 +37,7 @@ for i in result:
 # list of links to course materials pages
 course_materials = []
 for i in filtered:
-    course_materials.append('https://courses.maths.ox.ac.uk' + i + '/materials')
+    course_materials.append('https://courses.maths.ox.ac.uk' + i + '/materials')  # turns paths into links
 
 # go through each course_materials link
 for i in course_materials:
