@@ -3,11 +3,12 @@
 # Also requires lxml to be installed despite it not being imported
 from bs4 import BeautifulSoup
 import requests
-
-# Root: https://courses.maths.ox.ac.uk/
+from os import path
 
 # url to scrape from
 target_url = 'https://courses.maths.ox.ac.uk/overview/undergraduate'
+root = 'https://courses.maths.ox.ac.uk'
+download_path = str(path.join(input("Enter the full path to the download directory: "), ''))
 
 
 # function to get href from all <a> elements on page with given url
@@ -23,14 +24,21 @@ result = get_links(target_url)
 filtered = [i[:-1] for i in result if 'node' in i]
 
 # list of links to course materials pages (turns paths into links)
-course_materials = ['https://courses.maths.ox.ac.uk' + i + '/materials' for i in filtered]
+course_materials = [root + i + '/materials' for i in filtered]
 
-# go through each course_materials link
-for i in course_materials:
-    cm_links = get_links(i)  # get links on course materials page
-    # get all links with 'download' in them
-    download = ['https://courses.maths.ox.ac.uk' + j[:-1] for j in cm_links if 'download' in j]
-    for j in download:
-        r = requests.get(j)
-        with open(j[-5:] + '.zip', 'wb') as f:  # download the files
-            f.write(r.content)
+
+def download(dpath):
+    for i in course_materials:  # go through each course_materials link
+        cm_links = get_links(i)  # get links on course materials page
+        download = [root + j[:-1] for j in cm_links if 'download' in j]  # get all links with 'download' in them
+        for j in download:
+            r = requests.get(j)
+            with open(dpath + j[-5:] + '.zip', 'wb') as f:  # download the files
+                f.write(r.content)
+
+
+if path.isdir(download_path):
+    download(download_path)  # send to requested path
+else:
+    print("Path invalid, printing to working directory.")
+    download("")  # print to working directory instead
